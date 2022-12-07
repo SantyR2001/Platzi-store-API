@@ -12,8 +12,8 @@ router.post(
       const user = req.user;
       const secret = config.jwtSecret;
       const payload = {
-        sub: 1,
-        role: 'customer',
+        sub: user.id,
+        role: user.role,
       };
       const jwtConfig = {
         expiresIn: '7d',
