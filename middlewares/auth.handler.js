@@ -10,18 +10,19 @@ function checkApiKey(req, res, next) {
   }
 }
 
-function checkAdminRole(req, res, next) {
-  const user = req.user;
-  console.log(user);
-  if (user.role === 'admin') {
-    next();
-  } else {
-    next(
-      boom.forbidden(
-        'Se requieren permisos de administrador para realizar esta petición'
-      )
-    );
-  }
+function checkRoles(...roles) {
+  return (req, res, next) => {
+    const user = req.user;
+    if (roles.includes(user.role)) {
+      next();
+    } else {
+      next(
+        boom.forbidden(
+          'Se requieren permisos de administrador para realizar esta petición'
+        )
+      );
+    }
+  };
 }
 
-module.exports = { checkApiKey, checkAdminRole };
+module.exports = { checkApiKey, checkRoles };
