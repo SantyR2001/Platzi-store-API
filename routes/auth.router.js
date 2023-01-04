@@ -4,31 +4,30 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { config } = require('../config/config');
 
+const AuthService = require('../services/auth.service');
+const service = new AuthService();
+
 router.post(
   '/login',
   passport.authenticate('local', { session: false }),
   async (req, res, next) => {
     try {
       const user = req.user;
-      const secret = config.jwtSecret;
-      const payload = {
-        sub: user.id,
-        role: user.role,
-      };
-      const jwtConfig = {
-        expiresIn: '7d',
-      };
-
-      const token = jwt.sign(payload, secret, jwtConfig);
-
-      res.json({
-        user,
-        token,
-      });
+      res.json(service.signToken(user));
     } catch (error) {
       next(error);
     }
   }
 );
+
+router.post('/recovery', async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const response = await service.sendMail(email);
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;
